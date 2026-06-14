@@ -11,21 +11,21 @@ Sprite::~Sprite()
 void Sprite::InitSprites(int width, int height)
 {
 	x = 80;
-	y = 340;
+	y = 80;
 
 
-	maxFrame = 8;
+	maxFrame = 3;
 	curFrame = 0;
 	frameCount = 0;
 	frameDelay = 6;
-	frameWidth = 50;
-	frameHeight = 64;
-	animationColumns = 8;
+	frameWidth = 32;
+	frameHeight = 32;
+	animationColumns = 4;
 	animationDirection = 1;
 	isJumping = false;
 
-	image = al_load_bitmap("guy.bmp");
-	al_convert_mask_to_alpha(image, al_map_rgb(255,0,255));
+	image = al_load_bitmap("hero1.bmp");
+	al_convert_mask_to_alpha(image, al_map_rgb(255,255,255));
 }
 
 void Sprite::UpdateSprites(int width, int height, int dir)
