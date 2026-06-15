@@ -15,8 +15,8 @@ int main(void)
 	const int WIDTH = 900;
 	const int HEIGHT = 480;
 	const double LEVEL_TIME = 60.0;
-	bool keys[] = {false, false, false, false, false};
-	enum KEYS{UP, DOWN, LEFT, RIGHT, SPACE};
+	bool keys[] = {false, false, false, false};
+	enum KEYS{UP, DOWN, LEFT, RIGHT};
 	//variables
 	bool done = false;
 	bool render = false;
@@ -33,8 +33,6 @@ int main(void)
 	double timeRemaining = LEVEL_TIME;
 	//Player Variable
 	Sprite player;
-	const int JUMPIT=1600;
-	int jump = JUMPIT;
 
 
 
@@ -211,11 +209,6 @@ int main(void)
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = true;
 				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[SPACE] = true;
-				jump=30;
-				player.setJumping(true);
-				break;
 
 			}
 		}
@@ -237,10 +230,6 @@ int main(void)
 				break;
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = false;
-				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[SPACE] = false;
-				player.setJumping(false);
 				break;
 			}
 		}

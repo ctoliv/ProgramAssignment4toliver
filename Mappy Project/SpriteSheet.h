@@ -20,9 +20,7 @@ public:
 	float getY() {return y;}
 	int getWidth() {return frameWidth;}
 	int getHeight() {return frameHeight;}
-	int jumping(int jump, const int JUMPIT);
 	bool CollisionEndBlock();
-	void setJumping(bool value);
 	void StandStill();
 	void ResetPosition(float startX, float startY);
 
@@ -39,7 +37,6 @@ private:
 	int animationColumns;
 	int animationRows;
 	int animationDirection;
-	bool isJumping;
 
 	ALLEGRO_BITMAP *image;
 };

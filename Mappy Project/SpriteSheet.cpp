@@ -22,7 +22,7 @@ void Sprite::InitSprites(int width, int height)
 	frameHeight = 32;
 	animationColumns = 4;
 	animationDirection = 1;
-	isJumping = false;
+	
 
 	image = al_load_bitmap("hero1.bmp");
 	al_convert_mask_to_alpha(image, al_map_rgb(255,255,255));
@@ -94,75 +94,12 @@ void Sprite::DrawSprites(int xoffset, int yoffset)
 	);
 }
 
-void Sprite::setJumping(bool value)
-{
-	// Store whether the player is currently jumping.
-	isJumping = value;
-}
 
-int Sprite::jumping(int jump, const int JUMPIT)
-{
-	//handle jumping
-	if (jump==JUMPIT) { 
-		if (!collided(x + frameWidth/2, y + frameHeight + 5))
-			jump = 0; 
-	}
-	else
-	{
-		y -= jump / 3;
 
-		if (headCollided(x + frameWidth / 2, y))
-		{
-			y += jump / 3;
-			jump = 0;
-		}
 
-		jump--;
-		if (isJumping)
-		{
-			// Animate the jumping sequence only while spacebar is being pressed.
-			if (++frameCount > frameDelay)
-			{
-				frameCount = 0;
-				if (++curFrame > maxFrame)
-					curFrame = 1;
-			}
-		}
-		else
-		{
-			curFrame = 0;
-		}
-
-		// Stop the player from jumping above the top of the map.
-		if (y < 0)
-		{
-			y = 0;
-			jump = 0;
-		}
-	}
-
-	if (jump<0) 
-	{ 
-		if (collided(x + frameWidth/2,  y + frameHeight))
-		{ 
-			jump = JUMPIT; 
-			while (collided(x + frameWidth/2,y + frameHeight))
-			{
-				y -= 3;
-			}
-		} 
-	}
-	// Stop the player from falling too far below the level.
-	if (y > 1000)
-	{
-		y = 1000;
-		jump = JUMPIT;
-	}
-	return jump;
-}
 void Sprite::ResetPosition(float startX, float startY)
 {
-	x = startX;
-	y = startY;
-	curFrame = 0;
+    x = startX;
+    y = startY;
+    curFrame = 0;
 }
