@@ -28,53 +28,42 @@ void Sprite::InitSprites(int width, int height)
 	al_convert_mask_to_alpha(image, al_map_rgb(255,255,255));
 }
 
-void Sprite::UpdateSprites(int width, int height, int dir)
+void Sprite::UpdateSprites(int moveX, int moveY, int dir)
 {
-	int oldx = x;
-	int oldy = y;
+    int oldx = x;
+    int oldy = y;
 
-	if(dir == 1){ //right key
-		animationDirection = 1; 
-		x+=2; 
-		if (++frameCount > frameDelay)
-		{
-			frameCount=0;
-			if (++curFrame > maxFrame)
-				curFrame=1;
-		}
-	} else if (dir == 0){ //left key
-		animationDirection = 0; 
-		x-=2; 
-		if (++frameCount > frameDelay)
-		{
-			frameCount=0;
-			if (++curFrame > maxFrame)
-				curFrame=1;
-		}
-	}else //represent that they hit the space bar and that mean direction = 0
-		animationDirection = dir;
+    animationDirection = dir;
 
-	//check for collided with foreground tiles
-	if (animationDirection==0)
-	{ 
-		if (collided(x, y + frameHeight)) { //collision detection to the left
-			x = oldx; 
-			y= oldy;
-		}
+    x += moveX;
+    y += moveY;
 
-	}
-	else if (animationDirection ==1)
-	{ 
-		if (collided(x + frameWidth, y + frameHeight)) { //collision detection to the right
-			x = oldx; 
-			y= oldy;
-		}
-	}
+    // Check all four corners of the sprite.
+    if (collided(x, y) ||
+        collided(x + frameWidth - 1, y) ||
+        collided(x, y + frameHeight - 1) ||
+        collided(x + frameWidth - 1, y + frameHeight - 1))
+    {
+        x = oldx;
+        y = oldy;
+    }
+
+    if (++frameCount > frameDelay)
+    {
+        frameCount = 0;
+
+        if (++curFrame > maxFrame)
+            curFrame = 0;
+    }
 }
-
+void Sprite::StandStill()
+{
+	curFrame = 0;
+	animationDirection = 1;
+}
 bool Sprite::CollisionEndBlock()
 {
-	if (endValue(x + frameWidth/2, y + frameHeight + 5))
+	if (endValue(x + frameWidth / 2, y + frameHeight / 2))
 		return true;
 	else
 		return false;
@@ -85,23 +74,24 @@ void Sprite::DrawSprites(int xoffset, int yoffset)
 	int fx = (curFrame % animationColumns) * frameWidth;
 	int fy = (curFrame / animationColumns) * frameHeight;
 
-	if (isJumping)
+	int flags = 0;
+
+	// Flip the ant when moving left.
+	if (animationDirection == 2)
 	{
-		// Draw the jumping animation while the spacebar is pressed.
-		al_draw_bitmap_region(image, fx, fy, frameWidth, frameHeight, x - xoffset, y - yoffset, 0);
+		flags = ALLEGRO_FLIP_HORIZONTAL;
 	}
-	else if (animationDirection == 1)
-	{
-		al_draw_bitmap_region(image, fx, fy, frameWidth, frameHeight, x - xoffset, y - yoffset, 0);
-	}
-	else if (animationDirection == 0)
-	{
-		al_draw_bitmap_region(image, fx, fy, frameWidth, frameHeight, x - xoffset, y - yoffset, ALLEGRO_FLIP_HORIZONTAL);
-	}
-	else if (animationDirection == 2)
-	{
-		al_draw_bitmap_region(image, 0, 0, frameWidth, frameHeight, x - xoffset, y - yoffset, 0);
-	}
+
+	al_draw_bitmap_region(
+		image,
+		fx,
+		fy,
+		frameWidth,
+		frameHeight,
+		x - xoffset,
+		y - yoffset,
+		flags
+	);
 }
 
 void Sprite::setJumping(bool value)

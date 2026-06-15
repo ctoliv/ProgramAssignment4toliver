@@ -84,16 +84,26 @@ int main(void)
 			MapUpdateAnims();
 
 			render = true;
-			if(keys[UP])
-				;
-			else if(keys[DOWN])
-				;
-			else if(keys[LEFT])
-				player.UpdateSprites(WIDTH,HEIGHT,0);
-			else if(keys[RIGHT])
-				player.UpdateSprites(WIDTH,HEIGHT,1);
+			if (keys[UP])
+			{
+				player.UpdateSprites(0, -2, 0);
+			}
+			else if (keys[DOWN])
+			{
+				player.UpdateSprites(0, 2, 1);
+			}
+			else if (keys[LEFT])
+			{
+				player.UpdateSprites(-2, 0, 2);
+			}
+			else if (keys[RIGHT])
+			{
+				player.UpdateSprites(2, 0, 3);
+			}
 			else
-				player.UpdateSprites(WIDTH,HEIGHT,2);
+			{
+				player.StandStill();
+			}
 			if (player.CollisionEndBlock())
 			{
 				// End the level when the player touches the end point tile.
@@ -185,7 +195,7 @@ int main(void)
 
 			//draw foreground tiles
 			MapDrawFG(xOff,yOff, 0, 0, WIDTH, HEIGHT, 0);
-			jump=player.jumping(jump,JUMPIT);
+			
 			player.DrawSprites(xOff, yOff);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
