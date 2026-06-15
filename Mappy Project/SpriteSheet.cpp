@@ -1,12 +1,84 @@
 #include "SpriteSheet.h"
+SpriteGrabber::SpriteGrabber()
+{
+	sheet = NULL;
+	frameWidth = 0;
+	frameHeight = 0;
+	animationColumns = 1;
+}
 
+SpriteGrabber::~SpriteGrabber()
+{
+	if (sheet)
+		al_destroy_bitmap(sheet);
+}
+
+bool SpriteGrabber::LoadSheet(const char* filename, int frameW, int frameH, int columns)
+{
+	sheet = al_load_bitmap(filename);
+
+	if (!sheet)
+	{
+		cout << "Could not load sprite sheet: " << filename << endl;
+		return false;
+	}
+
+	al_convert_mask_to_alpha(sheet, al_map_rgb(255, 255, 255));
+
+	frameWidth = frameW;
+	frameHeight = frameH;
+	animationColumns = columns;
+
+	return true;
+}
+
+void SpriteGrabber::DrawFrame(int frame, float x, float y, bool flip)
+{
+	int fx = (frame % animationColumns) * frameWidth;
+	int fy = (frame / animationColumns) * frameHeight;
+
+	int flags = 0;
+
+	if (flip)
+		flags = ALLEGRO_FLIP_HORIZONTAL;
+
+	al_draw_bitmap_region(sheet, fx, fy, frameWidth, frameHeight, x, y, flags);
+}
+void SpriteGrabber::DrawRotatedFrame(int frame, float x, float y, float angle)
+{
+	int fx = (frame % animationColumns) * frameWidth;
+	int fy = (frame / animationColumns) * frameHeight;
+
+	ALLEGRO_BITMAP* frameImage = al_create_sub_bitmap(
+		sheet,
+		fx,
+		fy,
+		frameWidth,
+		frameHeight
+	);
+
+	if (frameImage)
+	{
+		al_draw_rotated_bitmap(
+			frameImage,
+			frameWidth / 2,
+			frameHeight / 2,
+			x + frameWidth / 2,
+			y + frameHeight / 2,
+			angle,
+			0
+		);
+
+		al_destroy_bitmap(frameImage);
+	}
+}
 Sprite::Sprite()
 {
-	image=NULL;
+	
 }
 Sprite::~Sprite()
 {
-	al_destroy_bitmap(image);
+	
 }
 void Sprite::InitSprites(int width, int height)
 {
@@ -24,8 +96,7 @@ void Sprite::InitSprites(int width, int height)
 	animationDirection = 1;
 	
 
-	image = al_load_bitmap("hero1.bmp");
-	al_convert_mask_to_alpha(image, al_map_rgb(255,255,255));
+	grabber.LoadSheet("hero1.bmp", frameWidth, frameHeight, animationColumns);
 }
 
 void Sprite::UpdateSprites(int moveX, int moveY, int dir)
@@ -59,7 +130,6 @@ void Sprite::UpdateSprites(int moveX, int moveY, int dir)
 void Sprite::StandStill()
 {
 	curFrame = 0;
-	animationDirection = 1;
 }
 bool Sprite::CollisionEndBlock()
 {
@@ -71,30 +141,26 @@ bool Sprite::CollisionEndBlock()
 
 void Sprite::DrawSprites(int xoffset, int yoffset)
 {
-	int fx = (curFrame % animationColumns) * frameWidth;
-	int fy = (curFrame / animationColumns) * frameHeight;
+	float drawX = x - xoffset;
+	float drawY = y - yoffset;
 
-	int flags = 0;
-
-	// Flip the ant when moving left.
-	if (animationDirection == 2)
+	if (animationDirection == 0) // up
 	{
-		flags = ALLEGRO_FLIP_HORIZONTAL;
+		grabber.DrawRotatedFrame(curFrame, drawX, drawY, -ALLEGRO_PI / 2);
 	}
-
-	al_draw_bitmap_region(
-		image,
-		fx,
-		fy,
-		frameWidth,
-		frameHeight,
-		x - xoffset,
-		y - yoffset,
-		flags
-	);
+	else if (animationDirection == 1) // down
+	{
+		grabber.DrawRotatedFrame(curFrame, drawX, drawY, ALLEGRO_PI / 2);
+	}
+	else if (animationDirection == 2) // left
+	{
+		grabber.DrawFrame(curFrame, drawX, drawY, true);
+	}
+	else // right
+	{
+		grabber.DrawFrame(curFrame, drawX, drawY, false);
+	}
 }
-
-
 
 
 void Sprite::ResetPosition(float startX, float startY)

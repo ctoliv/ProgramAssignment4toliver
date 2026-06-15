@@ -5,6 +5,22 @@
 #include <iostream>
 using namespace std;
 int headCollided(int x, int y);
+class SpriteGrabber
+{
+public:
+	SpriteGrabber();
+	~SpriteGrabber();
+
+	bool LoadSheet(const char* filename, int frameW, int frameH, int columns);
+	void DrawFrame(int frame, float x, float y, bool flip);
+	void DrawRotatedFrame(int frame, float x, float y, float angle);
+
+private:
+	ALLEGRO_BITMAP* sheet;
+	int frameWidth;
+	int frameHeight;
+	int animationColumns;
+};
 class Sprite
 {
 	friend int collided(int x, int y);
@@ -38,5 +54,5 @@ private:
 	int animationRows;
 	int animationDirection;
 
-	ALLEGRO_BITMAP *image;
+	SpriteGrabber grabber;
 };
