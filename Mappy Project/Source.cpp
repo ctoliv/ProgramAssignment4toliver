@@ -20,7 +20,6 @@ int main(void)
 	//variables
 	bool done = false;
 	bool render = false;
-	bool loadNextLevel = false;
 	bool levelComplete = false;
 	bool gameWon = false;
 	bool timeOver = false;
@@ -155,36 +154,7 @@ int main(void)
 				}
 			}
 			render = true;
-			if (loadNextLevel)
-			{
-				loadNextLevel = false;
-
-				MapFreeMem();
-
-				currentLevel++;
-
-				if (currentLevel > TOTAL_LEVELS)
-				{
-					gameWon = true;
-					levelComplete = true;
-					done = true;
-				}
-				else
-				{
-					char mapName[20];
-					sprintf_s(mapName, "map%d.fmp", currentLevel);
-
-					if (MapLoad(mapName, 1))
-					{
-						cout << "Could not load " << mapName << endl;
-						return -6;
-					}
-
-					player.ResetPosition(80, 80);
-					xOff = 0;
-					yOff = 0;
-				}
-			}
+			
 		}
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
