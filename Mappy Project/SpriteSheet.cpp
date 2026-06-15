@@ -160,3 +160,9 @@ int Sprite::jumping(int jump, const int JUMPIT)
 	}
 	return jump;
 }
+void Sprite::ResetPosition(float startX, float startY)
+{
+	x = startX;
+	y = startY;
+	curFrame = 0;
+}

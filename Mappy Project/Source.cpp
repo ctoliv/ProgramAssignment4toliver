@@ -19,7 +19,12 @@ int main(void)
 	//variables
 	bool done = false;
 	bool render = false;
+	bool loadNextLevel = false;
 	bool levelComplete = false;
+	bool gameWon = false;
+	int currentLevel = 1;
+	const int TOTAL_LEVELS = 3;
+
 	double startTime = 0;
 	double finalTime = 0;
 	//Player Variable
@@ -86,19 +91,19 @@ int main(void)
 			render = true;
 			if (keys[UP])
 			{
-				player.UpdateSprites(0, -2, 0);
+				player.UpdateSprites(0, -4, 0);
 			}
 			else if (keys[DOWN])
 			{
-				player.UpdateSprites(0, 2, 1);
+				player.UpdateSprites(0, 4, 1);
 			}
 			else if (keys[LEFT])
 			{
-				player.UpdateSprites(-2, 0, 2);
+				player.UpdateSprites(-4, 0, 2);
 			}
 			else if (keys[RIGHT])
 			{
-				player.UpdateSprites(2, 0, 3);
+				player.UpdateSprites(4, 0, 3);
 			}
 			else
 			{
@@ -106,15 +111,65 @@ int main(void)
 			}
 			if (player.CollisionEndBlock())
 			{
-				// End the level when the player touches the end point tile.
-				finalTime = al_get_time() - startTime;
-
 				cout << "Level complete!" << endl;
-				levelComplete = true;
-				done = true;
+
+				currentLevel++;
+
+				if (currentLevel > TOTAL_LEVELS)
+				{
+					gameWon = true;
+					levelComplete = true;
+					done = true;
+				}
+				else
+				{
+					MapFreeMem();
+
+					char mapName[20];
+					sprintf_s(mapName, "map%d.fmp", currentLevel);
+
+					if (MapLoad(mapName, 1))
+					{
+						cout << "Could not load " << mapName << endl;
+						return -6;
+					}
+
+					player.ResetPosition(80, 80);
+					xOff = 0;
+					yOff = 0;
+				}
 			}
 			render = true;
+			if (loadNextLevel)
+			{
+				loadNextLevel = false;
 
+				MapFreeMem();
+
+				currentLevel++;
+
+				if (currentLevel > TOTAL_LEVELS)
+				{
+					gameWon = true;
+					levelComplete = true;
+					done = true;
+				}
+				else
+				{
+					char mapName[20];
+					sprintf_s(mapName, "map%d.fmp", currentLevel);
+
+					if (MapLoad(mapName, 1))
+					{
+						cout << "Could not load " << mapName << endl;
+						return -6;
+					}
+
+					player.ResetPosition(80, 80);
+					xOff = 0;
+					yOff = 0;
+				}
+			}
 		}
 		else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
@@ -172,7 +227,7 @@ int main(void)
 				break;
 			}
 		}
-		if(render && al_is_event_queue_empty(event_queue))
+		if (!done && render && al_is_event_queue_empty(event_queue))
 		{
 			render = false;
 
@@ -201,19 +256,15 @@ int main(void)
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
 	}
-	if (levelComplete)
+	if (gameWon)
 	{
-		// Display the level completion message and time.
-		al_clear_to_color(al_map_rgb(0, 0, 0));
-
-		al_draw_textf(
+		al_draw_text(
 			font,
 			al_map_rgb(255, 255, 255),
 			WIDTH / 2,
 			HEIGHT / 2,
 			ALLEGRO_ALIGN_CENTER,
-			"Level completed in %.2f seconds",
-			finalTime
+			"You completed all 3 maze levels!"
 		);
 
 		al_flip_display();

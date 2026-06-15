@@ -24,6 +24,7 @@ public:
 	bool CollisionEndBlock();
 	void setJumping(bool value);
 	void StandStill();
+	void ResetPosition(float startX, float startY);
 
 private:
 	float x;
