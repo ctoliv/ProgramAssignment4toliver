@@ -14,6 +14,7 @@ int main(void)
 {
 	const int WIDTH = 900;
 	const int HEIGHT = 480;
+	const double LEVEL_TIME = 60.0;
 	bool keys[] = {false, false, false, false, false};
 	enum KEYS{UP, DOWN, LEFT, RIGHT, SPACE};
 	//variables
@@ -22,11 +23,14 @@ int main(void)
 	bool loadNextLevel = false;
 	bool levelComplete = false;
 	bool gameWon = false;
+	bool timeOver = false;
 	int currentLevel = 1;
 	const int TOTAL_LEVELS = 3;
 
 	double startTime = 0;
 	double finalTime = 0;
+	double levelStartTime = 0;
+	double timeRemaining = LEVEL_TIME;
 	//Player Variable
 	Sprite player;
 	const int JUMPIT=1600;
@@ -72,6 +76,7 @@ int main(void)
 
 	al_start_timer(timer);
 	startTime = al_get_time();
+	levelStartTime = al_get_time();
 	//draw the background tiles
 	MapDrawBG(xOff,yOff, 0, 0, WIDTH-1, HEIGHT-1);
 
@@ -87,6 +92,16 @@ int main(void)
 		if(ev.type == ALLEGRO_EVENT_TIMER)
 		{
 			MapUpdateAnims();
+
+			double elapsed = al_get_time() - levelStartTime;
+			timeRemaining = LEVEL_TIME - elapsed;
+
+			if (timeRemaining <= 0)
+			{
+				timeRemaining = 0;
+				timeOver = true;
+				done = true;
+			}
 
 			render = true;
 			if (keys[UP])
@@ -137,6 +152,8 @@ int main(void)
 					player.ResetPosition(80, 80);
 					xOff = 0;
 					yOff = 0;
+					levelStartTime = al_get_time();
+					timeRemaining = LEVEL_TIME;
 				}
 			}
 			render = true;
@@ -252,12 +269,24 @@ int main(void)
 			MapDrawFG(xOff,yOff, 0, 0, WIDTH, HEIGHT, 0);
 			
 			player.DrawSprites(xOff, yOff);
+			al_draw_textf(
+				font,
+				al_map_rgb(255, 255, 255),
+				10,
+				10,
+				0,
+				"Level: %d / 3   Time Remaining: %.1f",
+				currentLevel,
+				timeRemaining
+			);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
 	}
 	if (gameWon)
 	{
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+
 		al_draw_text(
 			font,
 			al_map_rgb(255, 255, 255),
@@ -265,6 +294,22 @@ int main(void)
 			HEIGHT / 2,
 			ALLEGRO_ALIGN_CENTER,
 			"You completed all 3 maze levels!"
+		);
+
+		al_flip_display();
+		al_rest(5.0);
+	}
+	else if (timeOver)
+	{
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+
+		al_draw_text(
+			font,
+			al_map_rgb(255, 255, 255),
+			WIDTH / 2,
+			HEIGHT / 2,
+			ALLEGRO_ALIGN_CENTER,
+			"Game Over! Time ran out."
 		);
 
 		al_flip_display();
